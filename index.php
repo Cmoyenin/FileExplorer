@@ -5,21 +5,23 @@ require "input.php";
  uploadFiles();
 require "tableau.php";
 
-// Si dir existe, donc qu'il y a un chemin qui existe
+// Si dir exist
 
 if (isset ( $_GET['dir'] )){
     
-    $directory = $_GET['dir']; // Le chemin est celui affiché dans l'URL, le chemin de dir
+    $directory = $_GET['dir']; 
 } else {
-    $directory = './'; // Sinon, c'est le chemin par défaut ./ qui est la racine du dossier
+    $directory = './'; 
 }
 
+        // if delete exist
+if (isset($_GET['delete']) && $_GET['delete'] == 1){ 
 
-if (isset($_GET['delete']) && $_GET['delete'] == 1){ // si on clique sur delete, delete vaut quelque chose
+    $fileToDelete = $_GET['file']; 
 
-    $fileToDelete = $_GET['file']; //$fileToDelete récupère le chemin du fichier à supprimer 
+    //rmdir for delete directory or unlink for delete file
 
-    if( is_dir($fileToDelete)){    //si le fichier est un dossier : rmdir, sinon unlink pour supprimer
+    if( is_dir($fileToDelete)){  
         rrmdir($fileToDelete);   
     }
     else {
@@ -30,17 +32,18 @@ if (isset($_GET['delete']) && $_GET['delete'] == 1){ // si on clique sur delete,
 
 
 
-// Pour chaque valeur (fichier) on créé une nouvelle itération de l'objet 'directory' : 
+// for every value
 
 foreach (new DirectoryIterator($directory) as $result){
     
-    // On récupère la méthode Filename : le nom du fichier, getSize : la taille du fichier et getMTime : la date de modification du fichier
-    
+
+    // some var for next step. 
+    //getFilename, getSize and getMTime are Directory Methods.
+
     $fileName = $result->getFilename();
     $chemin = $directory  . '/' . $fileName;
     $sizeUnits=formatSizeUnits( $result->getSize() );
     $time=date("d F Y H:i:s", $result->getMTime());
-    // Tableau généré tout seul par une variable 
     $table= $chemin . "'>" . $fileName . "</a></td><td>" . $sizeUnits . "</td>
     <td>". $time . "</td>
     <td><a href='?delete=1&file=".$chemin. "'>Delete Now!</a></td>
@@ -49,11 +52,11 @@ foreach (new DirectoryIterator($directory) as $result){
     
     echo "<tr>";
     
-    // Si la valeur du fichier est un . ou un .. on continue sans rien faire
+    // skip directory '.' and '..'
     
     if($result->isDot()) continue;
     
-    // Si le resultat est un dossier, on affiche le chemin avec le dir sinon sans le dir
+
     if ($result->isDir()){   
         
         echo "<td><a href='?dir=";    
